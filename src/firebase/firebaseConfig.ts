@@ -26,12 +26,12 @@ const app = initializeApp(firebaseConfig);
 
 // Authentication setup
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 
 // Google Sign-In
 export const signInWithGoogle = async (): Promise<User | null> => {
   try {
-    const result = await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
     console.error("Error during Google sign in:", error);
@@ -39,16 +39,7 @@ export const signInWithGoogle = async (): Promise<User | null> => {
   }
 };
 
-// Email and Password Sign-Up
-export const signUpWithEmail = async (email: string, password: string): Promise<User | null> => {
-  try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    return result.user;
-  } catch (error) {
-    console.error("Error during sign up:", error);
-    return null;
-  }
-};
+
 
 // Email and Password Sign-In
 export const signInWithEmail = async (email: string, password: string): Promise<User | null> => {
@@ -71,4 +62,4 @@ export const logOut = async (): Promise<void> => {
   }
 };
 
-export { auth, googleProvider };
+export { auth, provider };

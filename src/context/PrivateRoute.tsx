@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
 import { CircularProgress, Box } from '@mui/material';
 
 interface PrivateRouteProps {
-  children: JSX.Element;
+  children: ReactNode;  // Change from JSX.Element to ReactNode
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
@@ -24,7 +24,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Memoize the user state to avoid unnecessary re-renders
+  // Memoize authentication state
   const isAuthenticated = useMemo(() => !!currentUser || localStorage.getItem('isAuthenticated') === 'true', [currentUser]);
 
   if (loading) {
@@ -44,7 +44,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     return <Navigate to="/signin" />;
   }
 
-  return children;
+  return <>{children}</>;  // Wrap children in fragments to ensure proper rendering
 };
 
 export default PrivateRoute;

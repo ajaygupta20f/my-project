@@ -1,20 +1,18 @@
-import React, { useState, MouseEvent } from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  Avatar, 
-  Box, 
-  IconButton, 
-  Menu, 
-  MenuItem, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
+import React, { useState } from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
   ListItemText,
-  Divider 
+  Divider,
+  Box,
+  Avatar,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +27,14 @@ const Navbar: React.FC = () => {
   const authUser = useSelector((state: RootState) => state.user.authUser);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const toggleDrawer = (open: boolean) => (event: MouseEvent<HTMLElement>) => {
+  const toggleDrawer = (open: boolean) => (event: React.MouseEvent | React.KeyboardEvent) => {
+    if (
+      event.type === 'keydown' &&
+      ((event as React.KeyboardEvent).key === 'Tab' ||
+        (event as React.KeyboardEvent).key === 'Shift')
+    ) {
+      return;
+    }
     setDrawerOpen(open);
   };
 
@@ -41,13 +46,38 @@ const Navbar: React.FC = () => {
 
   const menuItems = [
     { text: 'Home', action: () => navigate('/') },
-    { text: 'Sign Out', action: handleSignOut }
+    // { text: 'Profile', action: () => navigate('/profile') },
+    { text: 'Sign Out', action: handleSignOut },
   ];
+
+  const drawerList = (
+    <Box
+      sx={{ width: 250 }}
+      role="presentation"
+      onClick={toggleDrawer(false)}
+      onKeyDown={toggleDrawer(false)}
+    >
+      <Typography variant="h6" sx={{ p: 2 }}>
+        React App
+      </Typography>
+      <Divider />
+      <List>
+        {menuItems.map((item, index) => (
+          <ListItem key={index} disablePadding>
+            <ListItemButton onClick={item.action}>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
 
   return (
     <>
       <AppBar position="static" color="primary">
         <Toolbar>
+          {/* Mobile Menu Icon */}
           <IconButton
             edge="start"
             color="inherit"
@@ -58,6 +88,7 @@ const Navbar: React.FC = () => {
             <MenuIcon />
           </IconButton>
 
+          {/* App Title */}
           <Typography
             variant="h6"
             component="div"
@@ -67,55 +98,41 @@ const Navbar: React.FC = () => {
             React App
           </Typography>
 
+          {/* Desktop Navigation */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
-            <Button color="inherit" onClick={() => navigate('/')}>Home</Button>
-            <Button color="inherit" onClick={handleSignOut}>Sign Out</Button>
+            <Button color="inherit" onClick={() => navigate('/')}>
+              Home
+            </Button>
+            
+            <Button color="inherit" onClick={handleSignOut}>
+              Sign Out
+            </Button>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
-            {authUser && (
-              <>
-                <Avatar 
-                  alt={authUser.displayName || ''} 
-                  src={authUser.photoURL || ''} 
-                  sx={{ width: 35, height: 35 }} 
-                />
-                <Typography variant="body1" sx={{ ml: 1, color: '#fff' }}>
-                  {authUser.displayName}
-                </Typography>
-              </>
-            )}
-          </Box>
+          {/* User Profile */}
+          {/* {authUser && (
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+              <Avatar
+                alt={authUser?.displayName || 'User'}
+                src={authUser?.photoURL || '/default-avatar.png'}
+                sx={{ width: 35, height: 35 }}
+              />
+              <Typography variant="body1" sx={{ ml: 1, color: '#fff' }}>
+                {authUser?.displayName || 'Guest'}
+              </Typography>
+            </Box> */}
+          {/* )} */}
         </Toolbar>
       </AppBar>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Navigation */}
       <Drawer
         anchor="left"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
         sx={{ display: { md: 'none' } }}
       >
-        <Box 
-          sx={{ width: 250 }} 
-          role="presentation" 
-          onClick={toggleDrawer(false)} 
-          onKeyDown={toggleDrawer(false)}
-        >
-          <Typography variant="h6" sx={{ p: 2 }}>
-            React App
-          </Typography>
-          <Divider />
-          <List>
-            {menuItems.map((item, index) => (
-              <ListItem key={index} disablePadding>
-                <ListItemButton onClick={item.action}>
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+        {drawerList}
       </Drawer>
     </>
   );
